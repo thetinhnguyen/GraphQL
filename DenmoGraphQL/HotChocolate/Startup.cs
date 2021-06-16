@@ -1,8 +1,12 @@
+using AppAny.HotChocolate.FluentValidation;
+using FluentValidation.AspNetCore;
 using GraphQL.Server.Ui.Voyager;
 using HotChocolateDemo.Data;
 using HotChocolateDemo.GraphQL;
 using HotChocolateDemo.GraphQL.Commands;
+using HotChocolateDemo.GraphQL.DataLoader;
 using HotChocolateDemo.GraphQL.Platforms;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -13,6 +17,7 @@ using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace HotChocolate
@@ -32,7 +37,20 @@ namespace HotChocolate
         {
             services.AddPooledDbContextFactory<AppDbContext>(opt => opt.UseSqlServer
             (Configuration.GetConnectionString("CommandConStr")));
-
+            //
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = "https://account.tpos.dev";
+                    options.Audience = "TShopApp";
+                    options.RequireHttpsMetadata = true;
+                });
+            //
+            services.AddFluentValidation(fv =>
+            {
+                fv.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+            });
+            //
             services
               .AddGraphQLServer()
               .AddQueryType<Query>()
@@ -44,10 +62,13 @@ namespace HotChocolate
               .AddType<CommandType>()
                 .AddType<AddCommandInputType>()
                 .AddType<AddCommandPayloadType>()
+                .AddDataLoader<CommandByIdDataLoader>()
               .AddFiltering()
                 .AddSorting()
-                .AddInMemorySubscriptions(); ;
-          
+                .AddInMemorySubscriptions()
+                .AddAuthorization()
+                .AddFluentValidation() ;
+
 
 
         }

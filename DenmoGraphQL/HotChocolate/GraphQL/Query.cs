@@ -1,6 +1,9 @@
-﻿using HotChocolate;
+﻿using AppAny.HotChocolate.FluentValidation;
+using HotChocolate;
 using HotChocolate.Data;
+using HotChocolate.Types;
 using HotChocolateDemo.Data;
+using HotChocolateDemo.GraphQL.Platforms;
 using HotChocolateDemo.Models;
 using System;
 using System.Collections.Generic;
@@ -20,6 +23,7 @@ namespace HotChocolateDemo.GraphQL
         [UseDbContext(typeof(AppDbContext))]
         [UseFiltering]
         [UseSorting]
+        [UsePaging]
         [GraphQLDescription("Gets the queryable platform.")]
         public IQueryable<Platform> GetPlatform([ScopedService] AppDbContext context)
         {
@@ -34,6 +38,7 @@ namespace HotChocolateDemo.GraphQL
         [UseDbContext(typeof(AppDbContext))]
         [UseFiltering]
         [UseSorting]
+        [UsePaging]
         [GraphQLDescription("Gets the queryable command.")]
         public IQueryable<Command> GetCommand([ScopedService] AppDbContext context)
         {
@@ -41,14 +46,13 @@ namespace HotChocolateDemo.GraphQL
         }
 
 
-        [UseDbContext(typeof(AppDbContext))]
-        [UseFiltering]
-        [UseSorting]
-        [GraphQLDescription("Gets the queryable platform with name")]
-        public IQueryable<Platform> GetPlatforms([ScopedService] AppDbContext context, string name)
-        {
-            return context.Platforms.Where(x => x.Name == name);
+        //[UseDbContext(typeof(AppDbContext))]
+       
+        //[GraphQLDescription("Gets the queryable platform with name")]
+        //public IQueryable<Platform> GetPlatforms([ScopedService] AppDbContext context,[UseFluentValidation] AddPlatformInput addPlatformInput)
+        //{
+        //    return context.Platforms.Where(x => x.Name == addPlatformInput.Name);
 
-        }
+        //}
     }
 }

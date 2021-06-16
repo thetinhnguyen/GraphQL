@@ -1,9 +1,12 @@
-﻿using HotChocolate;
+﻿using AppAny.HotChocolate.FluentValidation;
+using FluentValidation;
+using HotChocolate;
 using HotChocolate.Data;
 using HotChocolate.Subscriptions;
 using HotChocolateDemo.Data;
 using HotChocolateDemo.GraphQL.Commands;
 using HotChocolateDemo.GraphQL.Platforms;
+using HotChocolateDemo.GraphQL.Validatiors;
 using HotChocolateDemo.Models;
 using System;
 using System.Collections.Generic;
@@ -27,17 +30,17 @@ namespace HotChocolateDemo.GraphQL
         [UseDbContext(typeof(AppDbContext))]
         [GraphQLDescription("Adds a platform.")]
         public async Task<AddPlatformPayload> AddPlatformAsync(
-            AddPlatformInput input,
+          [UseFluentValidation] AddPlatformInput input,
             [ScopedService] AppDbContext context,
             [Service] ITopicEventSender eventSender,
             CancellationToken cancellationToken
             )
         {
+
             var platform = new Platform
             {
                 Name = input.Name
             };
-
             context.Platforms.Add(platform);
             await context.SaveChangesAsync(cancellationToken);
 

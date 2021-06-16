@@ -2,6 +2,7 @@
 using GraphQL.Types;
 using GraphQLDotNet.Contracts;
 using GraphQLDotNet.GraphQL.GraphQLTypes;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,8 @@ using System.Threading.Tasks;
 
 namespace GraphQLDotNet.GraphQL.GraphQLQueries
 {
-    public class AppQuery: ObjectGraphType
+
+	public class AppQuery: ObjectGraphType
     {
         public AppQuery(IOwnerRepository repository)
         {

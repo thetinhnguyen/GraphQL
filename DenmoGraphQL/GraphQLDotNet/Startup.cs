@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using GraphQL.Server.Ui.Playground;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace GraphQLDotNet
 {
@@ -36,14 +37,27 @@ namespace GraphQLDotNet
 
             services.AddScoped<AppSchema>();
 
-
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.Authority = "https://account.tpos.dev";
+                    options.Audience = "TShopApp";
+                    options.RequireHttpsMetadata = true;
+                });
             services.AddGraphQL(options =>
             {
                 options.EnableMetrics = true;
             })
                 .AddSystemTextJson()
                 .AddGraphTypes(typeof(AppSchema), ServiceLifetime.Scoped)
-                .AddDataLoader();
+                .AddDataLoader()
+                 .AddGraphQLAuthorization(options =>
+                 {
+                     options.AddPolicy("Authorized", p => p.RequireAuthenticatedUser());
+                     //var policy = new AuthorizationPolicyBuilder()
+                     //                    .
+                     //options.AddPolicy("Authorized", p => p.RequireClaim(ClaimTypes.Name, "Tom"));
+                 }); 
 
             services.AddControllers()
                 .AddNewtonsoftJson(o => o.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
@@ -65,6 +79,7 @@ namespace GraphQLDotNet
             app.UseHttpsRedirection();
 
             app.UseRouting();
+            app.UseAuthentication();
 
             app.UseAuthorization();
 
